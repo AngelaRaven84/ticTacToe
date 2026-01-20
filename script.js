@@ -8,15 +8,7 @@ let oGameData = {};
 
 window.addEventListener("load", () => {
 	initGlobalObject();
-	if (checkForGameOver() === 1) {
-		console.log("Spelare 1 vann");
-	} else if (checkForGameOver() === 2) {
-		console.log("Spelare 2 vann");
-	} else if (checkForGameOver() === 3) {
-		console.log("Oavgjort");
-	} else {
-		console.log("Spelet fortsätter");
-	}
+	prepGame();
 });
 
 /**
@@ -27,7 +19,7 @@ window.addEventListener("load", () => {
 function initGlobalObject() {
 	//Datastruktur för vilka platser som är lediga respektive har brickor
 	//Genom at fylla i här med antingen X eler O kan ni testa era rättningsfunktioner
-	oGameData.gameField = ["", "", "", "", "", "", "", "", ""];
+	oGameData.gameField = ["X", "X", "", "", "", "", "", "", ""];
 
 	/* Testdata för att testa rättningslösning */
 	//oGameData.gameField = ['X', 'X', 'X',
@@ -79,6 +71,8 @@ function initGlobalObject() {
 	//Referens till element för felmeddelanden
 	oGameData.timeRef = document.querySelector("#errorMsg");
 }
+
+console.log(oGameData.gameField);
 
 /**
  * Kontrollerar för tre i rad genom att anropa funktionen checkWinner() och checkForDraw().
@@ -138,7 +132,9 @@ function checkForDraw() {
 	}
 }
 // Nedanstående funktioner väntar vi med!
-function prepGame() {}
+function prepGame() {
+	console.log("prepGame()");
+}
 
 function initiateGame() {}
 
