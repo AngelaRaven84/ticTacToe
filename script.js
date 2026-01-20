@@ -19,7 +19,7 @@ window.addEventListener("load", () => {
 function initGlobalObject() {
 	//Datastruktur för vilka platser som är lediga respektive har brickor
 	//Genom at fylla i här med antingen X eler O kan ni testa era rättningsfunktioner
-	oGameData.gameField = ["X", "X", "", "", "", "", "", "", ""];
+	oGameData.gameField = ["", "", "", "", "", "", "", "", ""];
 
 	/* Testdata för att testa rättningslösning */
 	//oGameData.gameField = ['X', 'X', 'X',
@@ -70,9 +70,13 @@ function initGlobalObject() {
 
 	//Referens till element för felmeddelanden
 	oGameData.timeRef = document.querySelector("#errorMsg");
+	oGameData.gameAreaRef = document.querySelector("#gameArea");
+	oGameData.theFormRef = document.querySelector("#theForm");
+	oGameData.tableRef = document.querySelector(".ml-auto");
+	oGameData.jumboRef = document.querySelector(".jumbotron h1");
 }
 
-console.log(oGameData.gameField);
+//console.log(oGameData.gameField);
 
 /**
  * Kontrollerar för tre i rad genom att anropa funktionen checkWinner() och checkForDraw().
@@ -131,17 +135,57 @@ function checkForDraw() {
 		return false;
 	}
 }
-// Nedanstående funktioner väntar vi med!
 function prepGame() {
-	console.log("prepGame()");
+	oGameData.gameAreaRef.classList.add("d-none");
+
+	document.querySelector("#newGame").addEventListener("click", initiateGame);
+	//console.log(prepGame);
 }
 
-function initiateGame() {}
+function initiateGame() {
+	oGameData.theFormRef.classList.add("d-none");
+	oGameData.gameAreaRef.classList.remove("d-none");
 
-function executeMove(event) {}
+	document.querySelector("#errorMsg").textContent = "";
+
+	oGameData.nickNamePlayerOne = document.querySelector("#nick1").value;
+	oGameData.colorPlayerOne = document.querySelector("#color1").value;
+	oGameData.nickNamePlayerTwo = document.querySelector("#nick2").value;
+	oGameData.colorPlayerTwo = document.querySelector("#color2").value;
+
+	oGameData.gameField = ["", "", "", "", "", "", "", "", ""];
+	const tds = oGameData.tableRef.querySelectorAll("td");
+	tds.forEach((td) => {
+		td.textContent = "";
+		td.style.backgroundColor = "#ffffff";
+	});
+
+	let playerChar = "";
+	let playerName = "";
+
+	const rand = Math.random();
+	if (rand < 0.5) {
+		playerChar = oGameData.playerOne;
+		playerName = oGameData.nickNamePlayerOne;
+		oGameData.currentPlayer = oGameData.playerOne;
+	} else {
+		playerChar = oGameData.playerTwo;
+		playerName = oGameData.nickNamePlayerTwo;
+		oGameData.currentPlayer = oGameData.playerTwo;
+	}
+
+	oGameData.jumboRef.textContent = `Aktuell spelare är ${playerName}`;
+	oGameData.tableRef.addEventListener("click", executeMove);
+}
+
+function executeMove(event) {
+	if (event.target.tagName !== "TD") return;
+}
 
 function gameOver(result) {}
 
 function validateForm() {}
 
 function timer() {}
+
+// Nedanstående funktioner väntar vi med!
