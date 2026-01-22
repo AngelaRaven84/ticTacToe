@@ -180,12 +180,49 @@ function initiateGame() {
 
 function executeMove(event) {
 	if (event.target.tagName !== "TD") return;
+
+	const index = Number(event.target.getAttribute("data-id"));
+	if (!Number.isInteger(index)) return;
+
+	if (oGameData.gameField[index] !== "") return;
+
+	oGameData.gameField[index] = oGameData.currentPlayer;
+
+	if (oGameData.currentPlayer === oGameData.playerOne) {
+		event.target.textContent = oGameData.playerOne;
+		event.target.style.backgroundColor = oGameData.colorPlayerOne;
+
+		oGameData.currentPlayer = oGameData.playerTwo;
+		oGameData.jumboRef.textContent = `Aktuell spelare är ${oGameData.nickNamePlayerTwo}`;
+	} else {
+		event.target.textContent = oGameData.playerTwo;
+		event.target.style.backgroundColor = oGameData.colorPlayerTwo;
+
+		oGameData.currentPlayer = oGameData.playerOne;
+		oGameData.jumboRef.textContent = `Aktuell spelare är ${oGameData.nickNamePlayerOne}`;
+	}
+	const result = checkForGameOver();
+	if (result !== 0) gameOver(result);
 }
 
-function gameOver(result) {}
+function gameOver(result) {
+	oGameData.tableRef.removeEventListener("click", executeMove);
 
+	oGameData.theFormRef.classList.remove("d-none");
+	oGameData.gameAreaRef.classList.add("d-none");
+
+	if (result === 1) {
+		oGameData.jumboRef.textContent = `${oGameData.nickNamePlayerOne} vann! Spela igen?`;
+	} else if (result === 2) {
+		oGameData.jumboRef.textContent = `${oGameData.nickNamePlayerTwo} vann! Spela igen?`;
+	} else {
+		oGameData.jumboRef.textContent = `Oavgjort! Spela igen?`;
+	}
+
+	initGlobalObject();
+}
+
+// Nedanstående funktioner väntar vi med!
 function validateForm() {}
 
 function timer() {}
-
-// Nedanstående funktioner väntar vi med!
