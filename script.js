@@ -1,42 +1,16 @@
-"use strict";
+"use strict"; //Strikt läge, förhindrar vanliga misstag man annars lätt gör
 
-/**
- * Globalt objekt som innehåller de attribut som ni skall använda.
- * Initieras genom anrop till funktionern initGlobalObject().
- */
-let oGameData = {};
+let oGameData = {}; //Samlar allt i ett objekt istället för en massa lösa variabler. Lättare att hålla ordning
 
+//När sidan laddats startas spelet
 window.addEventListener("load", () => {
-	initGlobalObject();
-	prepGame();
+	initGlobalObject(); //skapar startvärden
+	prepGame(); //förbereder UI
 });
 
-/**
- * Initerar det globala objektet med de attribut som ni skall använda er av.
- * Funktionen tar inte emot några värden.
- * Funktionen returnerar inte något värde.
- */
 function initGlobalObject() {
-	//Datastruktur för vilka platser som är lediga respektive har brickor
-	//Genom at fylla i här med antingen X eler O kan ni testa era rättningsfunktioner
+	//Spelplanen som består av 9 rutor, ser till att den är tom
 	oGameData.gameField = ["", "", "", "", "", "", "", "", ""];
-
-	/* Testdata för att testa rättningslösning */
-	//oGameData.gameField = ['X', 'X', 'X',
-	//                        '', '', '',
-	//                        '', '', ''];
-	//oGameData.gameField = ['X', '', '',
-	//                       'X', '', '',
-	//                       'X', '', ''];
-	//oGameData.gameField = ['X', '', '',
-	//                       '', 'X', '',
-	//                       '', '', 'X'];
-	//oGameData.gameField = ['', '', 'O',
-	//                       '', 'O', '',
-	//                       'O', '', ''];
-	//oGameData.gameField = ['X', 'O', 'X',
-	//                       '0', 'X', 'O',
-	//                       'O', 'X', 'O'];
 
 	//Indikerar tecknet som skall användas för spelare ett.
 	oGameData.playerOne = "X";
@@ -68,7 +42,7 @@ function initGlobalObject() {
 	//Från start är timern inaktiverad
 	oGameData.timerEnabled = false;
 
-	//Referens till element för felmeddelanden
+	//Referens till olika element
 	oGameData.timeRef = document.querySelector("#errorMsg");
 	oGameData.gameAreaRef = document.querySelector("#gameArea");
 	oGameData.theFormRef = document.querySelector("#theForm");
@@ -76,16 +50,7 @@ function initGlobalObject() {
 	oGameData.jumboRef = document.querySelector(".jumbotron h1");
 }
 
-//console.log(oGameData.gameField);
-
-/**
- * Kontrollerar för tre i rad genom att anropa funktionen checkWinner() och checkForDraw().
- * Returnerar 0 om spelet skall fortsätta,
- * returnerar 1 om spelaren med ett kryss (X) är vinnare,
- * returnerar 2 om spelaren med en cirkel (O) är vinnare eller
- * returnerar 3 om det är oavgjort.
- * Funktionen tar inte emot några värden.
- */
+//Kollar om spelet är slut, returnerar de olika beroende på resultat av spelet
 function checkForGameOver() {
 	if (checkWinner(oGameData.playerOne)) {
 		return 1;
@@ -98,8 +63,6 @@ function checkForGameOver() {
 	}
 }
 
-// Säg till om ni vill få pseudokod för denna funktion
-// Viktigt att funktionen returnerar true eller false baserat på om den inskickade spelaren är winner eller ej
 function checkWinner(playerIn) {
 	// ska kontrollera om spelaren har 3 i rad, antingen är det true eller false
 
@@ -115,8 +78,10 @@ function checkWinner(playerIn) {
 		[2, 4, 6],
 	];
 
+	//loopar igenom alla kombinationer
 	for (let win of isWinner) {
 		const [a, b, c] = win;
+		//om alla tre rutorna innehåller samma spelare så är det vinst
 		if (
 			oGameData.gameField[a] === playerIn &&
 			oGameData.gameField[b] === playerIn &&
@@ -135,25 +100,29 @@ function checkForDraw() {
 		return false;
 	}
 }
+
+//förbereder spelet innan start, döljer spelplanen och kopplar startknappen
 function prepGame() {
 	oGameData.gameAreaRef.classList.add("d-none");
 
 	document.querySelector("#newGame").addEventListener("click", initiateGame);
-	//console.log(prepGame);
 }
 
+//startar en ny match
 function initiateGame() {
+	//gömmer formuläret och visar spelplanen
 	oGameData.theFormRef.classList.add("d-none");
 	oGameData.gameAreaRef.classList.remove("d-none");
 
 	document.querySelector("#errorMsg").textContent = "";
 
+	//hämtar namn och färger från inputfälten
 	oGameData.nickNamePlayerOne = document.querySelector("#nick1").value;
 	oGameData.colorPlayerOne = document.querySelector("#color1").value;
 	oGameData.nickNamePlayerTwo = document.querySelector("#nick2").value;
 	oGameData.colorPlayerTwo = document.querySelector("#color2").value;
 
-	oGameData.gameField = ["", "", "", "", "", "", "", "", ""];
+	//tömmer spelplanen visuellt och ser till att det är tomt
 	const tds = oGameData.tableRef.querySelectorAll("td");
 	tds.forEach((td) => {
 		td.textContent = "";
@@ -163,6 +132,7 @@ function initiateGame() {
 	let playerChar = "";
 	let playerName = "";
 
+	//slumpar fram vem som börjar
 	const rand = Math.random();
 	if (rand < 0.5) {
 		playerChar = oGameData.playerOne;
@@ -175,19 +145,25 @@ function initiateGame() {
 	}
 
 	oGameData.jumboRef.textContent = `Aktuell spelare är ${playerName}`;
+	//klick på spelplanen aktiverar ett drag
 	oGameData.tableRef.addEventListener("click", executeMove);
 }
 
+//Körs varje gång en ruta klickas och lägger ut antingen X eller O
 function executeMove(event) {
+	//om inget td klickas
 	if (event.target.tagName !== "TD") return;
 
+	//vilket index i arrayen motsvarar rutan?
 	const index = Number(event.target.getAttribute("data-id"));
 	if (!Number.isInteger(index)) return;
 
 	if (oGameData.gameField[index] !== "") return;
 
+	//spara drag i arrayen
 	oGameData.gameField[index] = oGameData.currentPlayer;
 
+	//uppdatera UI och byt spelare
 	if (oGameData.currentPlayer === oGameData.playerOne) {
 		event.target.textContent = oGameData.playerOne;
 		event.target.style.backgroundColor = oGameData.colorPlayerOne;
@@ -201,16 +177,21 @@ function executeMove(event) {
 		oGameData.currentPlayer = oGameData.playerOne;
 		oGameData.jumboRef.textContent = `Aktuell spelare är ${oGameData.nickNamePlayerOne}`;
 	}
+	//kollar om matchen är slut
 	const result = checkForGameOver();
 	if (result !== 0) gameOver(result);
 }
 
+//hanterar slutet av spelet
 function gameOver(result) {
+	//stoppa klick
 	oGameData.tableRef.removeEventListener("click", executeMove);
 
+	//visa formulär igen
 	oGameData.theFormRef.classList.remove("d-none");
 	oGameData.gameAreaRef.classList.add("d-none");
 
+	//visa resultattext
 	if (result === 1) {
 		oGameData.jumboRef.textContent = `${oGameData.nickNamePlayerOne} vann! Spela igen?`;
 	} else if (result === 2) {
@@ -219,6 +200,7 @@ function gameOver(result) {
 		oGameData.jumboRef.textContent = `Oavgjort! Spela igen?`;
 	}
 
+	//återställ allt
 	initGlobalObject();
 }
 
